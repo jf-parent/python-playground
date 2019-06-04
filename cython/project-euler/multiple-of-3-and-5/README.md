@@ -1,4 +1,4 @@
-source: (Multiples of 3 and 5)[https://projecteuler.net/problem=1]
+source: [Multiples of 3 and 5](https://projecteuler.net/problem=1)
 
 # Problem description
 
