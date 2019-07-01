@@ -1,11 +1,13 @@
-from libc.math cimport sqrt
+from libc.math cimport sqrt, ceil, log
 
 # Refs:
-# * https://www.wikiwand.com/en/Baillie%E2%80%93PSW_primality_test
-# * https://www.wikiwand.com/en/Lucas_pseudoprime#/Strong_Lucas_pseudoprimes
-# * https://www.wikiwand.com/en/Strong_pseudoprime
-# * https://www.wikiwand.com/en/Miller%E2%80%93Rabin_primality_test
-# * https://github.com/smllmn/baillie-psw
+# https://www.wikiwand.com/en/Baillie%E2%80%93PSW_primality_test
+# https://www.wikiwand.com/en/Lucas_pseudoprime#/Strong_Lucas_pseudoprimes
+# https://www.wikiwand.com/en/Strong_pseudoprime
+# https://www.wikiwand.com/en/Miller%E2%80%93Rabin_primality_test
+# https://github.com/smllmn/baillie-psw
+# https://www.wikiwand.com/en/Prime_number_theorem
+# https://codereview.stackexchange.com/questions/188053/project-euler-problem-7-in-python-10001st-prime-number
 
 cdef miller_rabin_base_2(int n):
     cdef int d = n - 1
@@ -124,17 +126,21 @@ cdef baillie_psw(int candidate):
 
     return True
 
-cpdef solution(int n):
-    primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43]
-    cdef int candidate = 47
-    while True:
-        if n < len(primes):
-            return primes[n-1]
+cdef upper_bound_for_p_n(int n):
+    if n < 6:
+        return 100
+    return ceil(n * (log(n) + log(log(n))))
 
-        if candidate % 1001 == 0:
-            print(candidate, len(primes))
+def find_primes(int limit):
+    nums = [True] * (limit + 1)
+    nums[0] = nums[1] = False
 
-        if baillie_psw(candidate):
-            primes.append(candidate)
+    for (i, is_prime) in enumerate(nums):
+        if is_prime:
+            yield i
+            for n in range(i * i, limit + 1, i):
+                nums[n] = False
 
-        candidate += 2
+def solution(n):
+    primes = list(find_primes(upper_bound_for_p_n(n)))
+    return primes[n - 1]
